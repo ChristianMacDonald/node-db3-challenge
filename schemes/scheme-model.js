@@ -12,13 +12,20 @@ function findSteps(id) {
     return db('steps as st').join('schemes as sc', 'st.scheme_id', 'sc.id').select('st.id', 'sc.scheme_name', 'st.step_number', 'st.instructions').where({ scheme_id: id });
 }
 
-function add(scheme) {
+async function add(scheme) {
+    const [id] = await db('schemes').insert(scheme);
+    return findById(id);
 }
 
-function update(changes, id) {
+async function update(changes, id) {
+    await db('schemes').where({ id }).update(changes);
+    return findById(id);
 }
 
-function remove(id) {
+async function remove(id) {
+    let scheme = await db('schemes').where({ id });
+    await db('schemes').where({ id }).delete();
+    return scheme;
 }
 
 module.exports = {
